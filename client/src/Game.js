@@ -28,7 +28,7 @@ function Game({ players, room, orientation, cleanup }) {
                     if (chess.isCheckmate()) { // if reason for game over is a checkmate
                         // Set message to checkmate. 
                         setOver(
-                            `Checkmate! ${chess.turn() === "w" ? "black" : "white"} wins!`
+                            `Checkmate! ${chess.turn() === "w" ? "Black" : "White"} wins!`
                         );
                         // The winner is determined by checking which side made the last move
                     } else if (chess.isDraw()) { // if it is a draw
@@ -78,11 +78,11 @@ function Game({ players, room, orientation, cleanup }) {
         moves.forEach(move => {
             if (chess.get(move.to)) { // Check if there's a piece on the target square
                 squaresToHighlight[move.to] = {
-                    backgroundImage: 'radial-gradient(circle at 50% 50%, transparent 55%, rgba(128,128,128,0.5) 31%, rgba(128,128,128,0.5) 65%, transparent 31%)'
+                    backgroundImage: 'radial-gradient(circle at 50% 50%, transparent 55%, rgba(128,128,128,0.5) 31%, rgba(128,128,128,0.5) 65%, transparent 31%)' //Indicate which pieces are able to be captured
                 };
             } else {
                 squaresToHighlight[move.to] = {
-                    backgroundImage: 'radial-gradient(circle, rgba(128,128,128,0.5) 30%, transparent 31%)'
+                    backgroundImage: 'radial-gradient(circle, rgba(128,128,128,0.5) 30%, transparent 31%)' //Indicate which positions are movable to
                 };
             }
         });
@@ -90,7 +90,7 @@ function Game({ players, room, orientation, cleanup }) {
         setHighlightSquares(squaresToHighlight);
     }
 
-    /** Handles the end of a piece drag
+    /** Handles the end of a piece drag, simply removes highlights
      *  @param piece piece being dragged
      *  @param sourceSquare initial piece position
      *  @param targetSquare target piece position
