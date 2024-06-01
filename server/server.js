@@ -37,8 +37,58 @@ io.on('connection', (socket) => {
             roomId,
             players: [{ id: socket.id, username: socket.data?.username }]
         });
-        // returns Map(1){'2b5b51a9-707b-42d6-9da8-dc19f863c0d0' => [{id: 'socketid', username: 'username1'}]}
 
         callback(roomId); //respond with roomId to client by calling the callback function from the client
+    });
+
+    /**
+     * Adds validation to confirm room ID
+     * If valid, joining player is added to the room and notify other player game is ready to begin
+     * If invalid, respond with error message
+    */
+    socket.on('joinRoom', async (args, callback) => {
+        // check if room exists and has a player waiting
+        const room = rooms.get(args.roomId);
+        let error, message;
+
+        if (!room) { // if room does not exist
+            error = true;
+            message = 'Room does not exist';
+        } else if (room.length <= 0) { // if room is empty set appropriate message
+            error = true;
+            message = 'Room is empty';
+        } else if (room.length >= 2) { // if room is full
+            error = true;
+            message = 'Room is full'; // set message to 'room is full'
+        }
+
+        if (error) {
+            if (callback) { // if user passed a callback, call it with an error payload
+                callback({
+                    error,
+                    message
+                });
+            }
+
+            return; // exit
+        }
+
+        await socket.join(args.roomId); // make the joining client join the room
+
+        // add the joining user's data to the list of players in the room
+        const roomUpdate = {
+            room,
+            players: [
+                ...room.players,
+                { id: socket.id, username: socket.data?.username },
+            ],
+        };
+
+        rooms.set(args.roomId, roomUpdate);
+
+        callback(roomUpdate); // respond to the client with the room details
+
+        // emit an 'opponentJoined' event to the room to tell the other player that an opponent has joined
+        socket.to(args.roomId).emit('opponentJoined', roomUpdate);
     });
 });
