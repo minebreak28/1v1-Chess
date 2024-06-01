@@ -92,3 +92,7 @@ io.on('connection', (socket) => {
         socket.to(args.roomId).emit('opponentJoined', roomUpdate);
     });
 });
+
+server.listen(port, () => {
+    console.log(`listening on *:${port}`);
+});
