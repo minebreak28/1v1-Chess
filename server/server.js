@@ -77,7 +77,7 @@ io.on('connection', (socket) => {
 
         // add the joining user's data to the list of players in the room
         const roomUpdate = {
-            room,
+            ...room,
             players: [
                 ...room.players,
                 { id: socket.id, username: socket.data?.username },
