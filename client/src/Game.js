@@ -134,8 +134,8 @@ function Game({ players, room, orientation, cleanup }) {
             </Card>
             <Stack flexDirection="row" sx={{ pt: 2 }}>
                 <div className="board" style={{
-                    maxWidth: 600,
-                    maxHeight: 600,
+                    maxWidth: 800,
+                    maxHeight: 800,
                     flexGrow: 1,
                 }}>
                     <Chessboard
@@ -160,6 +160,7 @@ function Game({ players, room, orientation, cleanup }) {
                     </Box>
                 )}
             </Stack>
+
             <CustomDialog // Game Over CustomDialog
                 open={Boolean(over)}
                 title={over}

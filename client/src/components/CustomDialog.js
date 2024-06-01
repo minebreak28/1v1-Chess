@@ -14,10 +14,24 @@ import DialogTitle from "@mui/material/DialogTitle";
  */
 export default function CustomDialog({ open, children, title, contentText, handleContinue }) {
     return (
-        <Dialog open={open}> {/*dialog container*/}
-            <DialogTitle>{title}</DialogTitle>
+        <Dialog
+            open={open}
+            slotProps={{
+                backdrop: {
+                    style: {
+                        backgroundImage: "url('/chessbackground.jpg')",
+                        backgroundSize: 'cover',
+                        backgroundRepeat: 'no-repeat',
+                        backgroundColor: '#000000',
+                        backgroundPosition: 'center'
+                    }
+                }
+            }}
+        >
+            {/* Dialog container */}
+            <DialogTitle sx={{ textAlign: 'center' }}>{title}</DialogTitle>
             <DialogContent> {/* Main body of modal/dialog */}
-                <DialogContentText> {/* main text */}
+                <DialogContentText> {/* Main text */}
                     {contentText}
                 </DialogContentText>
                 {children} {/* Other content */}
@@ -28,5 +42,6 @@ export default function CustomDialog({ open, children, title, contentText, handl
                 <Button onClick={handleContinue}>Continue</Button>
             </DialogActions>
         </Dialog>
+
     );
 }
