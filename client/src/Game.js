@@ -53,10 +53,7 @@ function Game({ players, room, orientation, cleanup }) {
      */
     function onDrop(sourceSquare, targetSquare) {
         // orientation is either 'white' or 'black'. game.turn() returns 'w' or 'b'
-        const sourcePiece = game.getPiece(sourceSquare);
-        if (!sourcePiece || sourcePiece.color !== game.turn()) {
-            return false; // The piece does not exist or belongs to the opponent
-        }
+        if ((chess.turn() !== orientation[0]) || (players.length < 2)) return false; // prohibit player from moving piece of other player
 
         const moveData = {
             from: sourceSquare,
