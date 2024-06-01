@@ -91,6 +91,11 @@ io.on('connection', (socket) => {
         // emit an 'opponentJoined' event to the room to tell the other player that an opponent has joined
         socket.to(args.roomId).emit('opponentJoined', roomUpdate);
     });
+
+    socket.on('move', (data) => {
+        // emit to all sockets in the room except the emitting socket.
+        socket.to(data.room).emit('move', data.move);
+    });
 });
 
 server.listen(port, () => {

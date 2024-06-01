@@ -1,3 +1,14 @@
+import {
+    Card,
+    CardContent,
+    List,
+    ListItem,
+    ListItemText,
+    ListSubheader,
+    Stack,
+    Typography,
+    Box,
+} from "@mui/material";
 import { useState, useMemo, useCallback } from "react";
 import { Chessboard } from "react-chessboard";
 import { Chess } from "chess.js";
