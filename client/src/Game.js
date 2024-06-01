@@ -9,7 +9,7 @@ import {
     Typography,
     Box,
 } from "@mui/material";
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { Chessboard } from "react-chessboard";
 import { Chess } from "chess.js";
 import CustomDialog from "./components/CustomDialog";
@@ -86,6 +86,12 @@ function Game({ players, room, orientation, cleanup }) {
         return true;
     }
 
+    useEffect(() => {
+        socket.on("move", (move) => {
+            makeAMove(move); //
+        });
+    }, [makeAMove]);
+
     /** Handles the start of a piece drag
      *  @param piece piece being dragged
      *  @param sourceSquare initial piece position
@@ -120,17 +126,41 @@ function Game({ players, room, orientation, cleanup }) {
 
     // Game component returned jsx
     return (
-        <>
-            <div className="board">
-                <Chessboard
-                    position={fen}
-                    onPieceDrop={onDrop}
-                    onPieceDragBegin={onDragStart}
-                    onPieceDragEnd={onDragEnd}
-                    customSquareStyles={highlightSquares}
-                />
-            </div>
-            <CustomDialog
+        <Stack>
+            <Card>
+                <CardContent>
+                    <Typography variant="h5">Room ID: {room}</Typography>
+                </CardContent>
+            </Card>
+            <Stack flexDirection="row" sx={{ pt: 2 }}>
+                <div className="board" style={{
+                    maxWidth: 600,
+                    maxHeight: 600,
+                    flexGrow: 1,
+                }}>
+                    <Chessboard
+                        position={fen}
+                        onPieceDragBegin={onDragStart}
+                        onPieceDragEnd={onDragEnd}
+                        customSquareStyles={highlightSquares}
+                        onPieceDrop={onDrop}
+                        boardOrientation={orientation}
+                    />
+                </div>
+                {players.length > 0 && (
+                    <Box>
+                        <List>
+                            <ListSubheader>Players</ListSubheader>
+                            {players.map((p) => (
+                                <ListItem key={p.id}>
+                                    <ListItemText primary={p.username} />
+                                </ListItem>
+                            ))}
+                        </List>
+                    </Box>
+                )}
+            </Stack>
+            <CustomDialog // Game Over CustomDialog
                 open={Boolean(over)}
                 title={over}
                 contentText={over}
@@ -138,7 +168,7 @@ function Game({ players, room, orientation, cleanup }) {
                     setOver("");
                 }}
             />
-        </>
+        </Stack>
     );
 }
 
