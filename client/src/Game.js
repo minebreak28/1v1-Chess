@@ -165,7 +165,8 @@ function Game({ players, room, orientation, cleanup }) {
                 title={over}
                 contentText={over}
                 handleContinue={() => {
-                    setOver("");
+                    socket.emit("closeRoom", { roomId: room });
+                    cleanup();
                 }}
             />
         </Stack>

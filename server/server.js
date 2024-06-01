@@ -54,10 +54,10 @@ io.on('connection', (socket) => {
         if (!room) { // if room does not exist
             error = true;
             message = 'Room does not exist';
-        } else if (room.length <= 0) { // if room is empty set appropriate message
+        } else if (room.players.length <= 0) { // if room is empty set appropriate message
             error = true;
             message = 'Room is empty';
-        } else if (room.length >= 2) { // if room is full
+        } else if (room.players.length >= 2) { // if room is full
             error = true;
             message = 'Room is full'; // set message to 'room is full'
         }
@@ -96,6 +96,20 @@ io.on('connection', (socket) => {
         // emit to all sockets in the room except the emitting socket.
         socket.to(data.room).emit('move', data.move);
     });
+
+    socket.on("closeRoom", async (data) => {
+        socket.to(data.roomId).emit("closeRoom", data); //inform others in the room that the room is closing
+
+        const clientSockets = await io.in(data.roomId).fetchSockets(); //get all sockets in a room
+
+        // loop over each socket client
+        clientSockets.forEach((s) => {
+            s.leave(data.roomId); //make them leave the room on socket.io
+        });
+
+        rooms.delete(data.roomId); //delete room from rooms map
+    });
+
 });
 
 server.listen(port, () => {
