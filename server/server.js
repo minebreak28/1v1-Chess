@@ -16,20 +16,29 @@ const io = new Server(server, {
     cors: '*', // allow connection from any origin
 });
 
+const rooms = new Map();
 
 // io.connection
 io.on('connection', (socket) => {
-    // socket refers to the client socket that just got connected.
-    // each socket is assigned an id
     console.log(socket.id, 'connected');
-    // listen to username event
 
+    // socket.on('username')
     socket.on('username', (username) => {
-        console.log('username:', username);
+        console.log(username);
         socket.data.username = username;
     });
-});
 
-server.listen(port, () => {
-    console.log(`listening on *:${port}`);
+    socket.on('createRoom', async (callback) => { // callback here refers to the callback function from the client passed as data
+        const roomId = uuidV4(); //creates new UID
+        await socket.join(roomId); //user who created the room, joins the room
+
+        // set roomId as a key and roomData including players as value in the map
+        rooms.set(roomId, {
+            roomId,
+            players: [{ id: socket.id, username: socket.data?.username }]
+        });
+        // returns Map(1){'2b5b51a9-707b-42d6-9da8-dc19f863c0d0' => [{id: 'socketid', username: 'username1'}]}
+
+        callback(roomId); //respond with roomId to client by calling the callback function from the client
+    });
 });
