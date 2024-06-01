@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from "react";
 import { Chessboard } from "react-chessboard";
 import { Chess } from "chess.js";
 import CustomDialog from "./components/CustomDialog";
+import socket from "./socket";
 
 function Game({ players, room, orientation, cleanup }) {
     /** Memoized Chess instance for move validation and generation with caching */
@@ -51,11 +52,17 @@ function Game({ players, room, orientation, cleanup }) {
      *  @param targetSquare target piece position
      */
     function onDrop(sourceSquare, targetSquare) {
+        // orientation is either 'white' or 'black'. game.turn() returns 'w' or 'b'
+        const sourcePiece = game.getPiece(sourceSquare);
+        if (!sourcePiece || sourcePiece.color !== game.turn()) {
+            return false; // The piece does not exist or belongs to the opponent
+        }
+
         const moveData = {
             from: sourceSquare,
             to: targetSquare,
-            color: chess.turn(), // returns current player's color
-            // promotion: "q",
+            color: chess.turn(),
+            promotion: "q", // promote to queen where possible
         };
 
         const move = makeAMove(moveData);
@@ -63,7 +70,10 @@ function Game({ players, room, orientation, cleanup }) {
         // illegal move
         if (move === null) return false;
 
-        setHighlightSquares({}); // Clear highlights after move
+        socket.emit("move", { // <- 3 emit a move event.
+            move,
+            room,
+        }); // this event will be transmitted to the opponent via the server
 
         return true;
     }
