@@ -1,3 +1,9 @@
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 import {
     Card,
     CardContent,
@@ -15,13 +21,14 @@ import { Chess } from "chess.js";
 import CustomDialog from "./components/CustomDialog";
 import socket from "./socket";
 
-function Game({ players, room, orientation, cleanup }) {
+function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinDialogOpen }) {
     /** Memoized Chess instance for move validation and generation with caching */
     const chess = useMemo(() => new Chess(), []);
     /** set initial notation state*/
     const [fen, setFen] = useState(chess.fen());
     const [over, setOver] = useState("");
     const [highlightSquares, setHighlightSquares] = useState({});
+    const [showGameOverDialog, setShowGameOverDialog] = useState(false);
 
     /**
      * Accepts a move and calls chess.move which validates the move object and updates the chess instance's internal state.
@@ -133,7 +140,7 @@ function Game({ players, room, orientation, cleanup }) {
                 </CardContent>
             </Card>
             <Stack flexDirection="row" sx={{ pt: 2 }}>
-                <div className="board" style={{
+                <Box className="board" style={{
                     maxWidth: 800,
                     maxHeight: 800,
                     flexGrow: 1,
@@ -146,32 +153,61 @@ function Game({ players, room, orientation, cleanup }) {
                         onPieceDrop={onDrop}
                         boardOrientation={orientation}
                     />
-                </div>
-                {players.length > 0 && (
-                    <Box>
-                        <List>
-                            <ListSubheader>Players</ListSubheader>
-                            {players.map((p) => (
-                                <ListItem key={p.id}>
-                                    <ListItemText primary={p.username} />
-                                </ListItem>
-                            ))}
-                        </List>
+                </Box>
+                <Stack>
+                    <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', height: '50%', whiteSpace: 'nowrap' }}>
+
+
+                        <Box>
+                            <List>
+                                {players.length > 1 ? (
+                                    <>
+                                        <ListSubheader>Players</ListSubheader>
+                                        {players.map((p) => (
+                                            <ListItem key={p.id}>
+                                                <ListItemText primary={p.username} />
+                                            </ListItem>
+                                        ))}
+                                    </>
+                                ) : (
+                                    <ListSubheader>Waiting for opponent...</ListSubheader>
+                                )}
+                            </List>
+                        </Box>
+                        <Box>
+                            <List>
+                                {spectators?.length > 1 ? (
+                                    <>
+
+                                    </>
+                                ) : (
+                                    <ListSubheader>Waiting for spectators...</ListSubheader>
+                                )}
+                            </List>
+                        </Box>
                     </Box>
-                )}
+                    <Box sx={{ display: 'flex', flexDirection: 'row', height: '50%', whiteSpace: 'nowrap' }}>
+                        Hello
+                    </Box>
+                </Stack>
+
+
+
             </Stack>
 
-            <CustomDialog // Game Over CustomDialog
-                open={Boolean(over)}
+        </Stack>
+    );
+}
+{/* <CustomDialog // Game Over CustomDialog
+                open={over}
                 title={over}
                 contentText={over}
                 handleContinue={() => {
                     socket.emit("closeRoom", { roomId: room });
                     cleanup();
+                    setStartOrJoinDialogOpen(true); // Show the button dialog when the game is over
                 }}
-            />
-        </Stack>
-    );
-}
-
+                handleClose={() => {
+                }}
+            /> */}
 export default Game;

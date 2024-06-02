@@ -2,18 +2,18 @@ import { Button, Stack, TextField, Dialog, DialogActions, DialogContent, DialogC
 import { useState } from "react";
 import socket from './socket';
 
-export default function InitGame({ setRoom, setOrientation, setPlayers }) {
-    const [roomDialogOpen, setRoomDialogOpen] = useState(false);
+export default function InitGame({ setRoom, setOrientation, setPlayers, startOrJoinDialogOpen, setStartOrJoinDialogOpen, roomDialogOpen, setRoomDialogOpen }) {
     const [roomInput, setRoomInput] = useState(''); // input state
     const [roomError, setRoomError] = useState('');
 
-    // Function to handle closing the dialog
-    const handleClose = () => {
+    // Function to handle closing the room dialog
+    const handleRoomDialogClose = () => {
         setRoomDialogOpen(false);
+        setStartOrJoinDialogOpen(true); // Reopen the start or join dialog
     };
 
     // Function to handle submitting room ID
-    const handleContinue = () => {
+    const handleRoomContinue = () => {
         if (!roomInput) return;
         socket.emit("joinRoom", { roomId: roomInput }, (r) => {
             if (r.error) return setRoomError(r.message);
@@ -38,20 +38,11 @@ export default function InitGame({ setRoom, setOrientation, setPlayers }) {
                 }
             }}
         >
+            {/* Room Dialog */}
             <Dialog
                 open={roomDialogOpen}
-                onClose={handleClose}
+                onClose={handleRoomDialogClose}
                 aria-labelledby="form-dialog-title"
-                slotProps={{
-                    backdrop: {
-                        style: {
-                            backgroundImage: "url('/chessbackground.jpg')",
-                            backgroundSize: 'cover',
-                            backgroundRepeat: 'no-repeat',
-                            backgroundPosition: 'center',
-                        }
-                    }
-                }}
             >
                 <DialogTitle id="form-dialog-title">Select Room to Join</DialogTitle>
                 <DialogContent>
@@ -75,34 +66,38 @@ export default function InitGame({ setRoom, setOrientation, setPlayers }) {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>Cancel</Button>
-                    <Button onClick={handleContinue}>Continue</Button>
+                    <Button onClick={handleRoomDialogClose}>Cancel</Button>
+                    <Button onClick={handleRoomContinue}>Continue</Button>
                 </DialogActions>
             </Dialog>
 
-            <Button
-                variant="contained"
-                onClick={() => {
-                    socket.emit("createRoom", (r) => {
-                        console.log(r);
-                        setRoom(r);
-                        setOrientation("white");
-                    });
-                }}
+            {/* Start or Join Dialog */}
+            <Dialog
+                open={startOrJoinDialogOpen}
+                onClose={() => setStartOrJoinDialogOpen(false)}
             >
-                Start a game
-            </Button>
-            {/* Button for joining a game */}
-            <Button
-                onClick={() => {
-                    setRoomDialogOpen(true)
-                }}
-            >
-                Join a game
-            </Button>
-
-
-
+                <Button
+                    variant="contained"
+                    onClick={() => {
+                        socket.emit("createRoom", (r) => {
+                            console.log(r);
+                            setStartOrJoinDialogOpen(false);
+                            setRoom(r);
+                            setOrientation("white");
+                        });
+                    }}
+                >
+                    Start a game
+                </Button>
+                <Button
+                    onClick={() => {
+                        setStartOrJoinDialogOpen(false);
+                        setRoomDialogOpen(true)
+                    }}
+                >
+                    Join a game
+                </Button>
+            </Dialog>
         </Stack>
     );
 }

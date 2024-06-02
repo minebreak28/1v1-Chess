@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import Container from "@mui/material/Container";
 import Game from "./Game";
 import InitGame from "./InitGame";
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Backdrop } from "@mui/material";
 import socket from "./socket";
 
 export default function App() {
@@ -11,13 +11,15 @@ export default function App() {
   const [room, setRoom] = useState(""); // stores current room ID
   const [orientation, setOrientation] = useState(""); // stores board orientation for user
   const [players, setPlayers] = useState([]); // stores players in room
-  const [showDialog, setShowDialog] = useState(!usernameSubmitted); // determines whether to show the dialog
+  const [showUsernameDialog, setShowUsernameDialog] = useState(true); // controls the visibility of the username dialog
+  const [startOrJoinDialogOpen, setStartOrJoinDialogOpen] = useState(false); // controls the visibility of start or join dialog
+  const [roomDialogOpen, setRoomDialogOpen] = useState(false); // controls the visibility of room dialog
 
   // resets the states responsible for initializing a game
   const cleanup = useCallback(() => {
     setRoom("");
     setOrientation("");
-    setPlayers("");
+    setPlayers([]);
   }, []);
 
   useEffect(() => {
@@ -27,37 +29,36 @@ export default function App() {
     });
   }, []);
 
-  // Function to handle closing the dialog
-  const handleClose = () => {
+  // Function to handle closing the username dialog
+  const handleUsernameDialogClose = () => {
     setUsernameSubmitted(true);
-    setShowDialog(false);
+    setShowUsernameDialog(false);
+    setStartOrJoinDialogOpen(true); // Open the start or join dialog after username is submitted
   };
 
   // Function to handle submitting username
-  const handleContinue = () => {
+  const handleUsernameContinue = () => {
     if (!username) return;
     socket.emit("username", username);
     setUsernameSubmitted(true);
-    setShowDialog(false);
+    setShowUsernameDialog(false);
+    setStartOrJoinDialogOpen(true); // Open the start or join dialog after username is submitted
   };
 
   return (
     <Container>
-      {/* Dialog container */}
-      <Dialog
-        open={showDialog}
-        slotProps={{
-          backdrop: {
-            style: {
-              backgroundImage: "url('/chessbackground.jpg')",
-              backgroundSize: 'cover',
-              backgroundRepeat: 'no-repeat',
-              backgroundColor: '#000000',
-              backgroundPosition: 'center'
-            }
-          }
-        }}
-      >
+      {/* Backdrop */}
+      <Backdrop open={showUsernameDialog || startOrJoinDialogOpen || roomDialogOpen} sx={{
+        backgroundImage: "url('/chessbackground.jpg')",
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        backgroundColor: '#000000',
+        backgroundPosition: 'center',
+        zIndex: (theme) => theme.zIndex.drawer + 1,
+      }} />
+
+      {/* Username Dialog */}
+      <Dialog open={showUsernameDialog}>
         <DialogTitle sx={{ textAlign: 'center' }}>1v1 Chess</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -78,8 +79,7 @@ export default function App() {
           />
         </DialogContent>
         <DialogActions>
-          {/* <Button onClick={handleClose}>Cancel</Button> */}
-          <Button onClick={handleContinue}>Continue</Button>
+          <Button onClick={handleUsernameContinue}>Continue</Button>
         </DialogActions>
       </Dialog>
 
@@ -91,12 +91,17 @@ export default function App() {
           username={username}
           players={players}
           cleanup={cleanup} // cleans up state when game is over
+          setStartOrJoinDialogOpen={setStartOrJoinDialogOpen} // Pass the function to Game component
         />
       ) : (
         <InitGame
           setRoom={setRoom}
           setOrientation={setOrientation}
           setPlayers={setPlayers}
+          startOrJoinDialogOpen={startOrJoinDialogOpen}
+          setStartOrJoinDialogOpen={setStartOrJoinDialogOpen}
+          roomDialogOpen={roomDialogOpen}
+          setRoomDialogOpen={setRoomDialogOpen}
         />
       )}
     </Container>

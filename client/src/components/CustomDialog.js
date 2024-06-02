@@ -10,23 +10,13 @@ import DialogTitle from "@mui/material/DialogTitle";
  * @param children prop to get component childrens
  * @param title title of dialog modal
  * @param contentText message to be displayed
- * @param handleContinue function to handle when the continue button is clicked
+ * @param handleContinue function to handle when the exit to lobby button is clicked
+ * @param handleClose function to handle when the close button is clicked
  */
-export default function CustomDialog({ open, children, title, contentText, handleContinue }) {
+export default function CustomDialog({ open, children, title, contentText, handleContinue, handleClose }) {
     return (
         <Dialog
             open={open}
-            slotProps={{
-                backdrop: {
-                    style: {
-                        backgroundImage: "url('/chessbackground.jpg')",
-                        backgroundSize: 'cover',
-                        backgroundRepeat: 'no-repeat',
-                        backgroundColor: '#000000',
-                        backgroundPosition: 'center'
-                    }
-                }
-            }}
         >
             {/* Dialog container */}
             <DialogTitle sx={{ textAlign: 'center' }}>{title}</DialogTitle>
@@ -38,8 +28,8 @@ export default function CustomDialog({ open, children, title, contentText, handl
             </DialogContent>
             <DialogActions> {/* Dialog action buttons */}
                 {/* Force users to make input without option to cancel */}
-                {/* <Button onClick={handleClose}>Cancel</Button> */}
-                <Button onClick={handleContinue}>Continue</Button>
+                <Button onClick={handleClose}>Cancel</Button>
+                <Button onClick={handleContinue}>Exit to Lobby</Button>
             </DialogActions>
         </Dialog>
 
