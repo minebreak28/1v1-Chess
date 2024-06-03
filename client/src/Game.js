@@ -11,6 +11,7 @@ import {
     Tooltip,
     Typography,
     Box,
+    Paper,
 } from "@mui/material";
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { Chessboard } from "react-chessboard";
@@ -27,6 +28,7 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
     const [highlightSquares, setHighlightSquares] = useState({});
     const [showGameOverDialog, setShowGameOverDialog] = useState(false);
     const [tooltipOpen, setTooltipOpen] = useState(false);
+    const [currentPlayerColor, setCurrentPlayerColor] = useState(chess.turn());
 
     /**
      * Accepts a move and calls chess.move which validates the move object and updates the chess instance's internal state.
@@ -67,7 +69,7 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
      *  @param sourceSquare initial piece position
      *  @param targetSquare target piece position
      */
-    function onDrop(sourceSquare, targetSquare) {
+    function onDrop(sourceSquare, targetSquare, piece) {
         // orientation is either 'white' or 'black'. game.turn() returns 'w' or 'b'
         if ((chess.turn() !== orientation[0]) || (players.length < 2)) return false; // prohibit player from moving piece of other player
 
@@ -75,7 +77,7 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
             from: sourceSquare,
             to: targetSquare,
             color: chess.turn(),
-            promotion: "q", // promote to queen where possible
+            promotion: piece.slice(-1).toLowerCase()
         };
 
         const move = makeAMove(moveData);
@@ -83,7 +85,7 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
         // illegal move
         if (move === null) return false;
 
-        socket.emit("move", { // <- 3 emit a move event.
+        socket.emit("move", { // emit a move event.
             move,
             room,
         }); // this event will be transmitted to the opponent via the server
@@ -96,6 +98,7 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
             makeAMove(move); //
         });
     }, [makeAMove]);
+
 
     /** Handles the start of a piece drag
      *  @param piece piece being dragged
@@ -129,13 +132,71 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
         setHighlightSquares({});
     }
 
-    /** Copies room id to clipboard */
+    /**
+     * Copies room id to clipboard
+     */
     function copyToClipboard() {
         navigator.clipboard.writeText(room)
             .then(() => {
                 setTooltipOpen(true);
                 setTimeout(() => setTooltipOpen(false), 2000); // Hide the tooltip after 2 seconds
             })
+    }
+
+    /**
+     * Converts a chess piece abbreviation to its full name.
+     * 
+     * @param {string} abbreviation abbreviation of the chess piece.
+     * @returns {string} full name of the chess piece corresponding to the abbreviation.
+     */
+    function pieceFullName(abbreviation) {
+        switch (abbreviation) {
+            case 'p':
+                return 'pawn';
+            case 'n':
+                return 'knight';
+            case 'b':
+                return 'bishop';
+            case 'r':
+                return 'rook';
+            case 'q':
+                return 'queen';
+            case 'k':
+                return 'king';
+            default:
+                return abbreviation; // Return the abbreviation if no match found
+        }
+    }
+
+    /**
+     * Generates a description for a given chess move.
+     * 
+     * @param {object} move The move object containing details of the move.
+     * @returns {string} A description of the move.
+     */
+    function getMoveDescription(move) {
+        const { color, piece, from, to, captured, promotion, flags } = move;
+
+        const fullPiece = pieceFullName(piece); // Get the full name of the piece
+
+        switch (flags) {
+            case 'n':
+            case 'b':
+                return `${color === 'w' ? 'White' : 'Black'} moved ${fullPiece} from ${from} to ${to}.`;
+            case 'e':
+            case 'c':
+                return `${color === 'w' ? 'White' : 'Black'} moved ${fullPiece} from ${from} to ${to}, capturing opponent ${pieceFullName(captured)}.`;
+            case 'np':
+                return `${fullPiece} moved from ${from} to ${to}, promoting to ${pieceFullName(promotion)}.`;
+            case 'k':
+                return `${color === 'w' ? 'White' : 'Black'} performed kingside castling.`;
+            case 'q':
+                return `${color === 'w' ? 'White' : 'Black'} performed queenside castling.`;
+            case 'cp':
+                return `${fullPiece} moved from ${from} to ${to}, capturing opponent ${pieceFullName(captured)} and promoting to ${pieceFullName(promotion)}.`;
+            default:
+                return `Invalid move, flag: ${flags}.`;
+        }
     }
 
     // Game component returned jsx
@@ -179,14 +240,14 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
                     />
                 </Box>
                 <Stack>
-                    <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', height: '50%', whiteSpace: 'nowrap' }}>
+                    <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', height: '20%', whiteSpace: 'nowrap', borderBottom: 'solid' }}>
 
 
                         <Box>
                             <List>
                                 {players.length > 1 ? (
                                     <>
-                                        <ListSubheader>Players</ListSubheader>
+                                        <ListSubheader sx={{ fontSize: '1.2rem' }}>Players</ListSubheader>
                                         {players.map((p) => (
                                             <ListItem key={p.id}>
                                                 <ListItemText primary={p.username} />
@@ -194,7 +255,7 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
                                         ))}
                                     </>
                                 ) : (
-                                    <ListSubheader>Waiting for opponent...</ListSubheader>
+                                    <ListSubheader sx={{ fontSize: '1.2rem' }}>Waiting for opponent...</ListSubheader>
                                 )}
                             </List>
                         </Box>
@@ -205,13 +266,54 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
 
                                     </>
                                 ) : (
-                                    <ListSubheader>Waiting for spectators...</ListSubheader>
+                                    <ListSubheader sx={{ fontSize: '1.2rem' }}>Waiting for spectators...</ListSubheader>
                                 )}
                             </List>
                         </Box>
                     </Box>
-                    <Box sx={{ display: 'flex', flexDirection: 'row', height: '50%', whiteSpace: 'nowrap' }}>
-                        Hello
+                    <Box sx={{ display: 'flex', flexDirection: 'row', height: '40%', whiteSpace: 'nowrap', borderBottom: 'solid' }}>
+                        {players.length > 1 ? (
+                            <>
+                                {chess.turn() == "w" ? `It is ${players[0].username}'s turn` : `It is ${players[1].username}'s' turn`}
+                            </>
+                        ) : (
+                            <>
+
+                            </>
+                        )}
+                    </Box>
+                    <Box sx={{ display: 'flex', flexDirection: 'row', height: '40%' }}>
+                        {players.length > 1 ? (
+                            <List sx={{ width: '100%', height: '100%' }}>
+                                <ListSubheader sx={{ fontSize: '1.2rem' }}>Move History</ListSubheader>
+                                {chess.history().length === 0 ? (
+                                    <ListSubheader>No moves made yet.</ListSubheader>
+
+                                ) : (
+                                    /** Logs move history, with the newest move at the top */
+                                    <Paper sx={{
+                                        width: '100%', height: '79%', overflowY: 'auto',
+                                    }}>
+                                        <Box sx={{ p: 2 }}>
+                                            <>
+                                                {
+                                                    chess.history({ verbose: true }).reverse().map((move, index) => (
+                                                        <Typography key={index} variant="body1" sx={{ overflowWrap: 'break-word' }}>
+                                                            {chess.history().length - index}. {getMoveDescription(move)}
+                                                        </Typography>
+                                                    ))
+                                                }
+                                            </>
+                                        </Box>
+                                    </Paper>
+                                )}
+                            </List>
+
+                        ) : (
+                            <>
+
+                            </>
+                        )}
                     </Box>
                 </Stack>
 
