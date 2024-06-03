@@ -76,10 +76,13 @@ export default function App() {
             type="text"
             fullWidth
             variant="outlined"
+            error={username.length > 10} // Display error if length exceeds 10 characters
+            helperText={username.length > 10 ? 'Maximum length is 10 characters' : ''}
           />
+
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleUsernameContinue}>Continue</Button>
+          <Button onClick={handleUsernameContinue} disabled={username.length > 10}>Continue</Button>
         </DialogActions>
       </Dialog>
 

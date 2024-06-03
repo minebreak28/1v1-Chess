@@ -240,7 +240,7 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
                     />
                 </Box>
                 <Stack>
-                    <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', height: '20%', whiteSpace: 'nowrap', borderBottom: 'solid' }}>
+                    <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', height: '30%', whiteSpace: 'nowrap', borderBottom: 'solid' }}>
 
 
                         <Box>
@@ -248,11 +248,22 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
                                 {players.length > 1 ? (
                                     <>
                                         <ListSubheader sx={{ fontSize: '1.2rem' }}>Players</ListSubheader>
-                                        {players.map((p) => (
-                                            <ListItem key={p.id}>
-                                                <ListItemText primary={p.username} />
-                                            </ListItem>
-                                        ))}
+                                        {players.map((p, index) => {
+                                            const playerLabel =
+                                                (orientation === 'white' && index === 0) ? <strong>{p.username} <strong>(You)</strong></strong> :
+                                                    (orientation === 'white' && index === 1) ? `${p.username}` :
+                                                        (orientation === 'black' && index === 0) ? `${p.username}` :
+                                                            (orientation === 'black' && index === 1) ? <strong>{p.username} <strong>(You)</strong></strong> :
+                                                                null;
+
+                                            return (
+                                                <ListItem key={p.id}>
+                                                    <ListItemText
+                                                        primary={<span>{playerLabel}</span>}
+                                                    />
+                                                </ListItem>
+                                            );
+                                        })}
                                     </>
                                 ) : (
                                     <ListSubheader sx={{ fontSize: '1.2rem' }}>Waiting for opponent...</ListSubheader>
