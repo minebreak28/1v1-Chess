@@ -273,9 +273,13 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
                     </Box>
                     <Box sx={{ display: 'flex', flexDirection: 'row', height: '40%', whiteSpace: 'nowrap', borderBottom: 'solid' }}>
                         {players.length > 1 ? (
-                            <>
-                                {chess.turn() == "w" ? `It is ${players[0].username}'s turn` : `It is ${players[1].username}'s' turn`}
-                            </>
+                            <List>
+                                <ListSubheader sx={{ fontSize: '1.2rem' }}>Game Status</ListSubheader>
+                                <ListItem>
+                                    <ListItemText>Turn: {chess.turn() == "w" ? `${players[0].username}` : `${players[1].username}`}</ListItemText>
+                                </ListItem>
+
+                            </List>
                         ) : (
                             <>
 
