@@ -1,10 +1,6 @@
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import {
+    Button,
     Card,
     CardContent,
     List,
@@ -12,6 +8,7 @@ import {
     ListItemText,
     ListSubheader,
     Stack,
+    Tooltip,
     Typography,
     Box,
 } from "@mui/material";
@@ -29,6 +26,7 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
     const [over, setOver] = useState("");
     const [highlightSquares, setHighlightSquares] = useState({});
     const [showGameOverDialog, setShowGameOverDialog] = useState(false);
+    const [tooltipOpen, setTooltipOpen] = useState(false);
 
     /**
      * Accepts a move and calls chess.move which validates the move object and updates the chess instance's internal state.
@@ -131,12 +129,38 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
         setHighlightSquares({});
     }
 
+    /** Copies room id to clipboard */
+    function copyToClipboard() {
+        navigator.clipboard.writeText(room)
+            .then(() => {
+                setTooltipOpen(true);
+                setTimeout(() => setTooltipOpen(false), 2000); // Hide the tooltip after 2 seconds
+            })
+    }
+
     // Game component returned jsx
     return (
         <Stack>
             <Card>
-                <CardContent>
-                    <Typography variant="h5">Room ID: {room}</Typography>
+                <CardContent sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Typography variant="h5" sx={{ marginRight: '16px' }}>Share the room ID with your friends to join as opponents or spectators.</Typography>
+                    <Tooltip
+                        title="Copied!"
+                        placement="right"
+                        open={tooltipOpen}
+                        disableFocusListener
+                        disableHoverListener
+                        disableTouchListener
+                    >
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            startIcon={<ContentCopyIcon />}
+                            onClick={copyToClipboard}
+                        >
+                            Copy Room ID
+                        </Button>
+                    </Tooltip>
                 </CardContent>
             </Card>
             <Stack flexDirection="row" sx={{ pt: 2 }}>
@@ -195,7 +219,7 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
 
             </Stack>
 
-        </Stack>
+        </Stack >
     );
 }
 {/* <CustomDialog // Game Over CustomDialog
