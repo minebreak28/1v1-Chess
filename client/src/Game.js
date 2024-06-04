@@ -119,6 +119,7 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
      *  @param sourceSquare initial piece position
      */
     function onDragStart(piece, sourceSquare) {
+        const pieceColor = piece.charAt(0);
         const moves = chess.moves({ square: sourceSquare, verbose: true });
         const squaresToHighlight = {};
         moves.forEach(move => {
@@ -132,8 +133,11 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
                 };
             }
         });
-
-        setHighlightSquares(squaresToHighlight);
+        if (pieceColor == orientation.charAt(0)) {
+            setHighlightSquares(squaresToHighlight);
+        } else {
+            setHighlightSquares({});
+        }
     }
 
     /** Handles the end of a piece drag, simply removes highlights
