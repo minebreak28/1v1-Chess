@@ -234,10 +234,10 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
     return (
         <Stack>
             <Card>
-                <CardContent sx={{}}>
+                <CardContent sx={{ display: 'grid', gridTemplateColumns: '1fr auto' }}>
                     {players.length === 0 ? (
                         <Typography variant="h5" sx={{ marginRight: '16px' }}>
-                            Share the room ID with your friends to join as opponents or spectators.
+                            Share the room ID with your friends to join as opponents
                         </Typography>
                     ) : (
                         <Typography variant="h5" sx={{ marginRight: '16px', display: 'flex', justifyContent: 'space-between' }}>
@@ -291,35 +291,6 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
                     />
                 </Box>
                 <Stack>
-                    {/* <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', height: '20%', whiteSpace: 'nowrap' }}>
-                        <Box>
-                            <List>
-                                {players.length > 1 ? (
-                                    <>
-                                        <ListSubheader sx={{ fontSize: '1.2rem' }}>Players</ListSubheader>
-                                        {players.map((p, index) => {
-                                            const playerLabel =
-                                                (orientation === 'white' && index === 0) ? <strong>{p.username} <strong>(You)</strong></strong> :
-                                                    (orientation === 'white' && index === 1) ? `${p.username}` :
-                                                        (orientation === 'black' && index === 0) ? `${p.username}` :
-                                                            (orientation === 'black' && index === 1) ? <strong>{p.username} <strong>(You)</strong></strong> :
-                                                                null;
-
-                                            return (
-                                                <ListItem key={p.id}>
-                                                    <ListItemText
-                                                        primary={<span>{playerLabel}</span>}
-                                                    />
-                                                </ListItem>
-                                            );
-                                        })}
-                                    </>
-                                ) : (
-                                    <ListSubheader sx={{ fontSize: '1.2rem' }}>Waiting for opponent...</ListSubheader>
-                                )}
-                            </List>
-                        </Box>
-                    </Box> */}
                     <Box sx={{ display: 'flex', flexDirection: 'row', height: '50%' }}>
                         {players.length > 1 ? (
                             <List sx={{ width: '100%', height: '100%' }}>
