@@ -84,7 +84,7 @@ export default function InitGame({ setRoom, setOrientation, setPlayers, startOrJ
                         Create a room or join existing room with code.
                     </DialogContentText>
                 </DialogContent>
-                <DialogActions sx={{ justifyContent: "space-around", margin: "0" }}>
+                <DialogActions sx={{ justifyContent: "space-around", marginY: "2%" }}>
                     <Button
                         variant="contained"
                         onClick={() => {
