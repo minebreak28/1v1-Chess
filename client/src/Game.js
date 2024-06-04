@@ -317,7 +317,7 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
                         )}
                     </Box>
                     <Box>
-                        {players.length < 1 ? (
+                        {players.length > 1 ? (
                             <>
                                 <div id="chat-box">
                                     <div id="messages">
