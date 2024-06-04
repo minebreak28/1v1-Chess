@@ -223,7 +223,7 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
             case 'q':
                 return `${color === 'w' ? 'White' : 'Black'} performed queenside castling.`;
             case 'cp':
-                return `${fullPiece} moved from ${from} to ${to}, capturing opponent ${pieceFullName(captured)} and promoting to ${pieceFullName(promotion)}.`;
+                return `${color === 'w' ? 'White' : 'Black'} ${fullPiece} moved from ${from} to ${to}, capturing opponent ${pieceFullName(captured)} and promoting to ${pieceFullName(promotion)}.`;
             default:
                 return `Invalid move, flag: ${flags}.`;
         }
@@ -291,33 +291,33 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
                     />
                 </Box>
                 <Stack class="statusContainer">
-                    <Box class="historyContainer">
+                    <Box>
                         {players.length > 1 ? (
-                            <List sx={{ width: '100%', height: '100%' }}>
-                                <ListSubheader sx={{ fontSize: '1.2rem', border: 'solid' }}>Move History</ListSubheader>
-                                {chess.history().length === 0 ? (
-                                    <ListSubheader>No moves made yet.</ListSubheader>
-                                ) : (
-                                    /** Logs move history, with the newest move at the top */
-                                    <Paper class="paper">
-                                            <Box sx={{ p: 2, border: "solid" }}>
+                            <>
+                                <div id="historyContainer">
+                                    <ListSubheader sx={{ fontSize: '1.2rem', borderColor: 'blue' }}>Move History</ListSubheader>
+                                    {chess.history().length === 0 ? (
+                                        <ListSubheader>No moves made yet.</ListSubheader>
+                                    ) : (
+                                        /** Logs move history, with the newest move at the top */
+                                        <Paper class="paper">
                                             {
                                                 chess.history({ verbose: true }).reverse().map((move, index) => (
-                                                    <Typography key={index} variant="body1" sx={{ overflowWrap: 'break-word' }}>
+                                                    <Typography key={index} variant="body1">
                                                         {chess.history().length - index}. {getMoveDescription(move)}
                                                     </Typography>
                                                 ))
                                             }
-                                        </Box>
-                                    </Paper>
-                                )}
-                            </List>
+                                        </Paper>
+                                    )}
+                                </div>
+                            </>
                         ) : (
                             <ListSubheader sx={{ fontSize: '1.5rem' }}>Waiting for opponent...</ListSubheader>
                         )}
                     </Box>
                     <Box>
-                        {players.length > 1 ? (
+                        {players.length < 1 ? (
                             <>
                                 <div id="chat-box">
                                     <div id="messages">
