@@ -290,28 +290,24 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
                         boardOrientation={orientation}
                     />
                 </Box>
-                <Stack>
-                    <Box sx={{ display: 'flex', flexDirection: 'row', height: '50%' }}>
+                <Stack class="statusContainer">
+                    <Box class="historyContainer">
                         {players.length > 1 ? (
                             <List sx={{ width: '100%', height: '100%' }}>
-                                <ListSubheader sx={{ fontSize: '1.2rem' }}>Move History</ListSubheader>
+                                <ListSubheader sx={{ fontSize: '1.2rem', border: 'solid' }}>Move History</ListSubheader>
                                 {chess.history().length === 0 ? (
                                     <ListSubheader>No moves made yet.</ListSubheader>
                                 ) : (
                                     /** Logs move history, with the newest move at the top */
-                                    <Paper sx={{
-                                        width: '100%', height: '79%', overflowY: 'auto',
-                                    }}>
-                                        <Box sx={{ p: 2 }}>
-                                            <>
-                                                {
-                                                    chess.history({ verbose: true }).reverse().map((move, index) => (
-                                                        <Typography key={index} variant="body1" sx={{ overflowWrap: 'break-word' }}>
-                                                            {chess.history().length - index}. {getMoveDescription(move)}
-                                                        </Typography>
-                                                    ))
-                                                }
-                                            </>
+                                    <Paper class="paper">
+                                            <Box sx={{ p: 2, border: "solid" }}>
+                                            {
+                                                chess.history({ verbose: true }).reverse().map((move, index) => (
+                                                    <Typography key={index} variant="body1" sx={{ overflowWrap: 'break-word' }}>
+                                                        {chess.history().length - index}. {getMoveDescription(move)}
+                                                    </Typography>
+                                                ))
+                                            }
                                         </Box>
                                     </Paper>
                                 )}
@@ -320,7 +316,7 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
                             <ListSubheader sx={{ fontSize: '1.5rem' }}>Waiting for opponent...</ListSubheader>
                         )}
                     </Box>
-                    <Box sx={{ height: '50%' }}>
+                    <Box>
                         {players.length > 1 ? (
                             <>
                                 <div id="chat-box">
