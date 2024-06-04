@@ -39,6 +39,7 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
      * After the move is made, check if it resulted in game over. If true, determine if checkmate or draw and update game's state accordingly.
      */
     const makeAMove = useCallback(
+
         (move) => {
             try {
                 const result = chess.move(move); // update Chess instance
@@ -118,6 +119,9 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
      *  @param sourceSquare initial piece position
      */
     function onDragStart(piece, sourceSquare) {
+        if (players.length !== 2) {
+            return;
+        }
         const moves = chess.moves({ square: sourceSquare, verbose: true });
         const squaresToHighlight = {};
         moves.forEach(move => {
