@@ -1,6 +1,7 @@
 import { Button, Stack, TextField, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 import { useState } from "react";
 import socket from './socket';
+import "./css/main.css";
 
 export default function InitGame({ setRoom, setOrientation, setPlayers, startOrJoinDialogOpen, setStartOrJoinDialogOpen, roomDialogOpen, setRoomDialogOpen }) {
     const [roomInput, setRoomInput] = useState(''); // input state
@@ -75,28 +76,37 @@ export default function InitGame({ setRoom, setOrientation, setPlayers, startOrJ
             <Dialog
                 open={startOrJoinDialogOpen}
                 onClose={() => setStartOrJoinDialogOpen(false)}
+                sx={{ padding: "3" }}
             >
-                <Button
-                    variant="contained"
-                    onClick={() => {
-                        socket.emit("createRoom", (r) => {
-                            console.log(r);
+                <DialogTitle>Create or Join Game</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Create a room or join existing room with code.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions sx={{ justifyContent: "space-around", margin: "0" }}>
+                    <Button
+                        variant="contained"
+                        onClick={() => {
+                            socket.emit("createRoom", (r) => {
+                                console.log(r);
+                                setStartOrJoinDialogOpen(false);
+                                setRoom(r);
+                                setOrientation("white");
+                            });
+                        }}
+                    >
+                        Create Room
+                    </Button>
+                    <Button
+                        onClick={() => {
                             setStartOrJoinDialogOpen(false);
-                            setRoom(r);
-                            setOrientation("white");
-                        });
-                    }}
-                >
-                    Start a game
-                </Button>
-                <Button
-                    onClick={() => {
-                        setStartOrJoinDialogOpen(false);
-                        setRoomDialogOpen(true)
-                    }}
-                >
-                    Join a game
-                </Button>
+                            setRoomDialogOpen(true)
+                        }}
+                    >
+                        Join Room
+                    </Button>
+                </DialogActions>
             </Dialog>
         </Stack>
     );
