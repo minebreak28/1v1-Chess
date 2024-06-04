@@ -119,9 +119,6 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
      *  @param sourceSquare initial piece position
      */
     function onDragStart(piece, sourceSquare) {
-        if (players.length !== 2) {
-            return;
-        }
         const moves = chess.moves({ square: sourceSquare, verbose: true });
         const squaresToHighlight = {};
         moves.forEach(move => {
