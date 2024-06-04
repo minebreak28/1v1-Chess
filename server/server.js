@@ -110,6 +110,14 @@ io.on('connection', (socket) => {
         rooms.delete(data.roomId); //delete room from rooms map
     });
 
+    socket.on('chatMessage', (data) => {
+        // Broadcast the chat message to everyone in the room
+        socket.to(data.roomId).emit('chatMessage', {
+            username: socket.data.username,
+            message: data.message,
+        });
+    });
+
 });
 
 server.listen(port, () => {

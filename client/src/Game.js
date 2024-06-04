@@ -12,12 +12,14 @@ import {
     Typography,
     Box,
     Paper,
+    TextField
 } from "@mui/material";
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { Chessboard } from "react-chessboard";
 import { Chess } from "chess.js";
 import CustomDialog from "./components/CustomDialog";
 import socket from "./socket";
+import "./css/main.css";
 
 function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinDialogOpen }) {
     /** Memoized Chess instance for move validation and generation with caching */
@@ -28,7 +30,8 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
     const [highlightSquares, setHighlightSquares] = useState({});
     const [showGameOverDialog, setShowGameOverDialog] = useState(false);
     const [tooltipOpen, setTooltipOpen] = useState(false);
-    const [currentPlayerColor, setCurrentPlayerColor] = useState(chess.turn());
+    const [chatMessages, setChatMessages] = useState([]);
+    const [chatInput, setChatInput] = useState("");
 
     /**
      * Accepts a move and calls chess.move which validates the move object and updates the chess instance's internal state.
@@ -99,6 +102,16 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
         });
     }, [makeAMove]);
 
+    useEffect(() => {
+        socket.on('chatMessage', (data) => {
+            setChatMessages((prevMessages) => [...prevMessages, data]);
+        });
+
+        return () => {
+            socket.off("chatMessage");
+        };
+    }, []);
+
 
     /** Handles the start of a piece drag
      *  @param piece piece being dragged
@@ -142,6 +155,23 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
                 setTimeout(() => setTooltipOpen(false), 2000); // Hide the tooltip after 2 seconds
             })
     }
+
+    // Handle sending a chat message
+    const sendMessage = () => {
+        if (chatInput.trim() !== "") {
+            let senderUsername;
+            if (orientation === 'white') {
+                senderUsername = players[0]?.username + (players[0]?.id === socket.id ? " (You)" : "");
+            } else {
+                senderUsername = players[1]?.username + (players[1]?.id === socket.id ? " (You)" : "");
+            }
+
+            const newMessage = { username: senderUsername, message: chatInput };
+            setChatMessages(prevMessages => [...prevMessages, newMessage]);
+            socket.emit('chatMessage', { roomId: room, message: chatInput });
+            setChatInput(""); // Clear the input field
+        }
+    };
 
     /**
      * Converts a chess piece abbreviation to its full name.
@@ -199,29 +229,50 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
         }
     }
 
+
     // Game component returned jsx
     return (
         <Stack>
             <Card>
-                <CardContent sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Typography variant="h5" sx={{ marginRight: '16px' }}>Share the room ID with your friends to join as opponents or spectators.</Typography>
-                    <Tooltip
-                        title="Copied!"
-                        placement="right"
-                        open={tooltipOpen}
-                        disableFocusListener
-                        disableHoverListener
-                        disableTouchListener
-                    >
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            startIcon={<ContentCopyIcon />}
-                            onClick={copyToClipboard}
+                <CardContent sx={{}}>
+                    {players.length === 0 ? (
+                        <Typography variant="h5" sx={{ marginRight: '16px' }}>
+                            Share the room ID with your friends to join as opponents or spectators.
+                        </Typography>
+                    ) : (
+                        <Typography variant="h5" sx={{ marginRight: '16px', display: 'flex', justifyContent: 'space-between' }}>
+                            <>
+                                <Typography variant="h5" sx={{ marginRight: '16px' }}>
+                                    {orientation === 'white' ? players[0].username : players[1].username} (You)
+                                </Typography>
+                                <Typography variant="h5" sx={{ marginX: 'auto' }}>
+                                    VS
+                                </Typography>
+                                <Typography variant="h5" sx={{ marginLeft: '16px' }}>
+                                    {orientation === 'white' ? players[1].username : players[0].username} (Opponent)
+                                </Typography>
+                            </>
+                        </Typography>
+                    )}
+                    {players.length === 0 && ( // Only render copy button if players.length is 0
+                        <Tooltip
+                            title="Copied!"
+                            placement="right"
+                            open={tooltipOpen}
+                            disableFocusListener
+                            disableHoverListener
+                            disableTouchListener
                         >
-                            Copy Room ID
-                        </Button>
-                    </Tooltip>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                startIcon={<ContentCopyIcon />}
+                                onClick={copyToClipboard}
+                            >
+                                Copy Room ID
+                            </Button>
+                        </Tooltip>
+                    )}
                 </CardContent>
             </Card>
             <Stack flexDirection="row" sx={{ pt: 2 }}>
@@ -240,9 +291,7 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
                     />
                 </Box>
                 <Stack>
-                    <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', height: '30%', whiteSpace: 'nowrap', borderBottom: 'solid' }}>
-
-
+                    {/* <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', height: '20%', whiteSpace: 'nowrap' }}>
                         <Box>
                             <List>
                                 {players.length > 1 ? (
@@ -270,40 +319,13 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
                                 )}
                             </List>
                         </Box>
-                        <Box>
-                            <List>
-                                {spectators?.length > 1 ? (
-                                    <>
-
-                                    </>
-                                ) : (
-                                    <ListSubheader sx={{ fontSize: '1.2rem' }}>Waiting for spectators...</ListSubheader>
-                                )}
-                            </List>
-                        </Box>
-                    </Box>
-                    <Box sx={{ display: 'flex', flexDirection: 'row', height: '40%', whiteSpace: 'nowrap', borderBottom: 'solid' }}>
-                        {players.length > 1 ? (
-                            <List>
-                                <ListSubheader sx={{ fontSize: '1.2rem' }}>Game Status</ListSubheader>
-                                <ListItem>
-                                    <ListItemText>Turn: {chess.turn() == "w" ? `${players[0].username}` : `${players[1].username}`}</ListItemText>
-                                </ListItem>
-
-                            </List>
-                        ) : (
-                            <>
-
-                            </>
-                        )}
-                    </Box>
-                    <Box sx={{ display: 'flex', flexDirection: 'row', height: '40%' }}>
+                    </Box> */}
+                    <Box sx={{ display: 'flex', flexDirection: 'row', height: '50%' }}>
                         {players.length > 1 ? (
                             <List sx={{ width: '100%', height: '100%' }}>
                                 <ListSubheader sx={{ fontSize: '1.2rem' }}>Move History</ListSubheader>
                                 {chess.history().length === 0 ? (
                                     <ListSubheader>No moves made yet.</ListSubheader>
-
                                 ) : (
                                     /** Logs move history, with the newest move at the top */
                                     <Paper sx={{
@@ -323,19 +345,44 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
                                     </Paper>
                                 )}
                             </List>
-
+                        ) : (
+                            <ListSubheader sx={{ fontSize: '1.5rem' }}>Waiting for opponent...</ListSubheader>
+                        )}
+                    </Box>
+                    <Box sx={{ height: '50%' }}>
+                        {players.length > 1 ? (
+                            <>
+                                <div id="chat-box">
+                                    <div id="messages">
+                                        {chatMessages.slice(0).reverse().map((msg, index) => (
+                                            <div key={index} className="message">
+                                                <strong>{msg.username}: </strong>{msg.message}
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div id="input-container">
+                                        <input
+                                            type="text"
+                                            id="user-input"
+                                            placeholder="Type a message..."
+                                            autoFocus
+                                            value={chatInput}
+                                            onChange={(e) => setChatInput(e.target.value)}
+                                            onKeyPress={(e) => {
+                                                if (e.key === 'Enter') sendMessage();
+                                            }}
+                                        />
+                                        <button id="send-button" onClick={sendMessage}>Send</button>
+                                    </div>
+                                </div>
+                            </>
                         ) : (
                             <>
-
                             </>
                         )}
                     </Box>
                 </Stack>
-
-
-
             </Stack>
-
         </Stack >
     );
 }
