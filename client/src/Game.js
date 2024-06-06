@@ -3,16 +3,12 @@ import {
     Button,
     Card,
     CardContent,
-    List,
-    ListItem,
-    ListItemText,
     ListSubheader,
     Stack,
     Tooltip,
     Typography,
     Box,
     Paper,
-    TextField
 } from "@mui/material";
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { Chessboard } from "react-chessboard";
@@ -28,7 +24,6 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
     const [fen, setFen] = useState(chess.fen());
     const [over, setOver] = useState("");
     const [highlightSquares, setHighlightSquares] = useState({});
-    const [showGameOverDialog, setShowGameOverDialog] = useState(false);
     const [tooltipOpen, setTooltipOpen] = useState(false);
     const [chatMessages, setChatMessages] = useState([]);
     const [chatInput, setChatInput] = useState("");
@@ -133,7 +128,7 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
                 };
             }
         });
-        if (pieceColor == orientation.charAt(0)) {
+        if (pieceColor === orientation.charAt(0)) {
             setHighlightSquares(squaresToHighlight);
         } else {
             setHighlightSquares({});
@@ -363,8 +358,6 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
                     socket.emit("closeRoom", { roomId: room });
                     cleanup();
                     setStartOrJoinDialogOpen(true); // Show the button dialog when the game is over
-                }}
-                handleClose={() => {
                 }}
             />
         </Stack >
