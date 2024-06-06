@@ -355,10 +355,7 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
                     </Box>
                 </Stack>
             </Stack>
-        </Stack >
-    );
-}
-{/* <CustomDialog // Game Over CustomDialog
+            <CustomDialog // Game Over CustomDialog
                 open={over}
                 title={over}
                 contentText={over}
@@ -369,5 +366,10 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
                 }}
                 handleClose={() => {
                 }}
-            /> */}
+            />
+        </Stack >
+
+    );
+
+}
 export default Game;
