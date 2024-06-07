@@ -3,9 +3,10 @@ import { useState } from "react";
 import socket from './socket';
 import "./css/main.css";
 
+// Initializes a game and allows players to create or join a room
 export default function InitGame({ setRoom, setOrientation, setPlayers, startOrJoinDialogOpen, setStartOrJoinDialogOpen, roomDialogOpen, setRoomDialogOpen }) {
     const [roomInput, setRoomInput] = useState(''); // input state
-    const [roomError, setRoomError] = useState('');
+    const [roomError, setRoomError] = useState(''); // error state
 
     // Function to handle closing the room dialog
     const handleRoomDialogClose = () => {

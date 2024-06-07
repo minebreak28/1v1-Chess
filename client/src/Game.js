@@ -17,7 +17,16 @@ import CustomDialog from "./components/CustomDialog";
 import socket from "./socket";
 import "./css/main.css";
 
-function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinDialogOpen }) {
+/**
+ * Controls the entirety of the chess game
+ * @param players players in the room
+ * @param room room ID
+ * @param orientation the orientation (w or b) of the current player
+ * @param cleanup resets the state when a game is over
+ * @param setStartOrJoinDialogOpen opens or closes the start/join room dialog box
+ * @returns 
+ */
+function Game({ players, room, orientation, cleanup, setStartOrJoinDialogOpen }) {
     /** Memoized Chess instance for move validation and generation with caching */
     const chess = useMemo(() => new Chess(), []);
     /** set initial notation state*/
@@ -45,31 +54,25 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
 
                 if (chess.isGameOver()) { // check if move led to "game over"
                     if (chess.isCheckmate()) { // if reason for game over is a checkmate
-                        // Set message to checkmate. 
-                        setOver(
-                            "Game over!"
-                        );
-                        setContext(
-                            `${chess.turn() === "w" ? "Black" : "White"} wins by checkmate!`
-                        );
+                        setOver("Game over!");
+                        setContext(`${chess.turn() === "w" ? "Black" : "White"} wins by checkmate!`);
                     } else if (chess.isStalemate()) { // if it is a stalemate
                         setOver("Game over!");
                         setContext("The game ends in a stalemate.");
                     } else if (chess.isDraw()) { // if it is a draw
                         setOver("Game over!");
                         setContext("The game ends in a draw.");
-                    } else {
+                    } else { // This should never occur.
                         setOver("Game over!");
                         setContext(
                             "An error has occured."
                         );
                     }
                 }
-
                 return result;
             } catch (e) {
-                return null;
-            } // null if the move was illegal, the move object if the move was legal
+                return null; // null if the move was illegal, the move object if the move was legal
+            }
         },
         [chess]
     );
@@ -102,17 +105,20 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
         return true;
     }
 
+    // when client receives a move event, the move is validated and played using the makeAMove function
     useEffect(() => {
         socket.on("move", (move) => {
             makeAMove(move); //
         });
     }, [makeAMove]);
 
+
     useEffect(() => {
+        // sends chat messages to the other player
         socket.on('chatMessage', (data) => {
             setChatMessages((prevMessages) => [...prevMessages, data]);
         });
-
+        // if player disconnects, other player is notified
         socket.on('playerDisconnected', (player) => {
             setOver("You win due to opponent forfeit.")
             setContext(`${player.username} has disconnected`); // set game over
@@ -143,6 +149,7 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
                 };
             }
         });
+        // Only highlight the board if the piece moved is the current player's
         if (pieceColor === orientation.charAt(0)) {
             setHighlightSquares(squaresToHighlight);
         } else {
@@ -150,13 +157,8 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
         }
     }
 
-    /** Handles the end of a piece drag, simply removes highlights
-     *  @param piece piece being dragged
-     *  @param sourceSquare initial piece position
-     *  @param targetSquare target piece position
-     *  @param didMove boolean indicating if the piece moved
-     */
-    function onDragEnd(piece, sourceSquare, targetSquare, didMove) {
+    // Handles the end of a piece drag, simply removes highlights
+    function onDragEnd() {
         setHighlightSquares({});
     }
 
@@ -376,8 +378,6 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
                 }}
             />
         </Stack >
-
     );
-
 }
 export default Game;

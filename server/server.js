@@ -5,7 +5,7 @@ const http = require('http');
 
 const app = express(); // initialize express
 
-const server = http.createServer(app); //HTTP server created
+const server = http.createServer(app); // HTTP server created
 
 
 // set port to value received from environment variable or 8080 if null
@@ -16,6 +16,7 @@ const io = new Server(server, {
     cors: '*', // allow connection from any origin
 });
 
+// holds all the rooms
 const rooms = new Map();
 
 // io.connection
@@ -143,6 +144,7 @@ io.on('connection', (socket) => {
 
 });
 
+// Starts server and have it listen on specified port
 server.listen(port, () => {
     console.log(`listening on *:${port}`);
 });
