@@ -22,12 +22,13 @@ const rooms = new Map();
 io.on('connection', (socket) => {
     console.log(socket.id, 'connected');
 
-    // socket.on('username')
+    // username is submitted
     socket.on('username', (username) => {
         console.log(username);
         socket.data.username = username;
     });
 
+    // room is created
     socket.on('createRoom', async (callback) => { // callback here refers to the callback function from the client passed as data
         const roomId = uuidV4(); //creates new UID
         await socket.join(roomId); //user who created the room, joins the room
@@ -92,11 +93,13 @@ io.on('connection', (socket) => {
         socket.to(args.roomId).emit('opponentJoined', roomUpdate);
     });
 
+    // player makes a move
     socket.on('move', (data) => {
         // emit to all sockets in the room except the emitting socket.
         socket.to(data.room).emit('move', data.move);
     });
 
+    // room is closed
     socket.on("closeRoom", async (data) => {
         socket.to(data.roomId).emit("closeRoom", data); //inform others in the room that the room is closing
 
@@ -110,11 +113,31 @@ io.on('connection', (socket) => {
         rooms.delete(data.roomId); //delete room from rooms map
     });
 
+    // message is sent in chat
     socket.on('chatMessage', (data) => {
         // Broadcast the chat message to everyone in the room
         socket.to(data.roomId).emit('chatMessage', {
             username: socket.data.username,
             message: data.message,
+        });
+    });
+
+    // player is disconnected
+    socket.on("disconnect", () => {
+        const gameRooms = Array.from(rooms.values()); // list of available rooms
+
+        gameRooms.forEach((room) => { // <- 2
+            const userInRoom = room.players.find((player) => player.id === socket.id); // <- 3
+
+            if (userInRoom) {
+                if (room.players.length < 2) {
+                    // if there's only 1 player in the room, close room and exit
+                    rooms.delete(room.roomId);
+                    return;
+                }
+
+                socket.to(room.roomId).emit("playerDisconnected", userInRoom); // <- 4
+            }
         });
     });
 

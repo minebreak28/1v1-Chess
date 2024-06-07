@@ -23,6 +23,7 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
     /** set initial notation state*/
     const [fen, setFen] = useState(chess.fen());
     const [over, setOver] = useState("");
+    const [context, setContext] = useState("");
     const [highlightSquares, setHighlightSquares] = useState({});
     const [tooltipOpen, setTooltipOpen] = useState(false);
     const [chatMessages, setChatMessages] = useState([]);
@@ -46,13 +47,22 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
                     if (chess.isCheckmate()) { // if reason for game over is a checkmate
                         // Set message to checkmate. 
                         setOver(
-                            `Checkmate! ${chess.turn() === "w" ? "Black" : "White"} wins!`
+                            "Game over!"
                         );
-                        // The winner is determined by checking which side made the last move
+                        setContext(
+                            `${chess.turn() === "w" ? "Black" : "White"} wins by checkmate!`
+                        );
+                    } else if (chess.isStalemate()) { // if it is a stalemate
+                        setOver("Game over!");
+                        setContext("The game ends in a stalemate.");
                     } else if (chess.isDraw()) { // if it is a draw
-                        setOver("Draw"); // set message to "Draw"
+                        setOver("Game over!");
+                        setContext("The game ends in a draw.");
                     } else {
-                        setOver("Game over");
+                        setOver("Game over!");
+                        setContext(
+                            "An error has occured."
+                        );
                     }
                 }
 
@@ -101,6 +111,11 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
     useEffect(() => {
         socket.on('chatMessage', (data) => {
             setChatMessages((prevMessages) => [...prevMessages, data]);
+        });
+
+        socket.on('playerDisconnected', (player) => {
+            setOver("You win due to opponent forfeit.")
+            setContext(`${player.username} has disconnected`); // set game over
         });
 
         return () => {
@@ -353,7 +368,7 @@ function Game({ players, spectators, room, orientation, cleanup, setStartOrJoinD
             <CustomDialog // Game Over CustomDialog
                 open={over}
                 title={over}
-                contentText={over}
+                contentText={context}
                 handleContinue={() => {
                     socket.emit("closeRoom", { roomId: room });
                     cleanup();
