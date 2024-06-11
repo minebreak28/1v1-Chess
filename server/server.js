@@ -2,20 +2,19 @@ const express = require('express');
 const { Server } = require("socket.io");
 const { v4: uuidV4 } = require('uuid');
 const http = require('http');
-const path = require('path');
-const app = express(); // initialize express
-const server = http.createServer(app); // HTTP server created
-const port = process.env.PORT || 8080 // set port to value received from environment variable or 8080 if null
-const io = new Server(server, { cors: '*' }); // upgrade http server to websocket server
-// Parses JSON bodies
-app.use(express.json());
-// Serve static files from the react app
-app.use(express.static(path.join(__dirname, '../client/public')));
-// all other requests point to the index.html file
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../client/public', 'index.html'));
-});
 
+const app = express(); // initialize express
+
+const server = http.createServer(app); // HTTP server created
+
+
+// set port to value received from environment variable or 8080 if null
+const port = process.env.PORT || 8080
+
+// upgrade http server to websocket server
+const io = new Server(server, {
+    cors: '*', // allow connection from any origin
+});
 
 // holds all the rooms
 const rooms = new Map();
