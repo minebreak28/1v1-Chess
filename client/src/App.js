@@ -54,7 +54,7 @@ export default function App() {
         <DialogTitle sx={{ textAlign: 'center' }}>1v1 Chess</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you prepared to face your friends in an epic chess showdown? Reveal your name, brave challenger!
+            Are you prepared to face your friends in an epic chess showdown? Enter your name:
           </DialogContentText>
           <TextField
             autoFocus
