@@ -10,7 +10,8 @@ phases:
     commands:
       - npm run build --prefix client
       - cp -r client/build server/  # Move the build to server directory
-      - zip -r server.zip server  # Zip the server directory
+      - cd server
+      - zip -r ../server.zip .  # Zip everything inside the server directory
 
 artifacts:
   files:
