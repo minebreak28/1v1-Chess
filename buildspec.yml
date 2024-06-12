@@ -1,0 +1,17 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 14
+    commands:
+      - npm install
+  build:
+    commands:
+      - npm run build --prefix client
+      - cp -r client/build server/  # Move the build to server directory
+      - zip -r server.zip server  # Zip the server directory
+
+artifacts:
+  files:
+    - server.zip
