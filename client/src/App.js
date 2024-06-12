@@ -7,7 +7,6 @@ import socket from "./socket";
 
 export default function App() {
   const [username, setUsername] = useState("");
-  const [usernameSubmitted, setUsernameSubmitted] = useState(false);
   const [room, setRoom] = useState(""); // stores current room ID
   const [orientation, setOrientation] = useState(""); // stores board orientation for user
   const [players, setPlayers] = useState([]); // stores players in room
@@ -29,18 +28,11 @@ export default function App() {
     });
   }, []);
 
-  // Function to handle closing the username dialog
-  const handleUsernameDialogClose = () => {
-    setUsernameSubmitted(true);
-    setShowUsernameDialog(false);
-    setStartOrJoinDialogOpen(true); // Open the start or join dialog after username is submitted
-  };
 
   // Function to handle submitting username
   const handleUsernameContinue = () => {
     if (!username) return;
     socket.emit("username", username);
-    setUsernameSubmitted(true);
     setShowUsernameDialog(false);
     setStartOrJoinDialogOpen(true); // Open the start or join dialog after username is submitted
   };
