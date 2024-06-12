@@ -2,19 +2,22 @@ const express = require('express');
 const { Server } = require("socket.io");
 const { v4: uuidV4 } = require('uuid');
 const http = require('http');
-
-const app = express(); // initialize express
-
-const server = http.createServer(app); // HTTP server created
-
-
-// set port to value received from environment variable or 8080 if null
-const port = process.env.PORT || 8080
-
-// upgrade http server to websocket server
+const app = express();
+const server = http.createServer(app);
+const port = process.env.PORT || 8080;
+const path = require('path');
 const io = new Server(server, {
-    cors: '*', // allow connection from any origin
+    cors: {
+        origin: '*', // Update this with your frontend URL in production
+        methods: ['GET', 'POST']
+    }
 });
+const buildPath = path.join(__dirname, 'build');
+app.use(express.static(buildPath));
+app.get('*', (req, res) => {
+    res.sendFile(path.join(buildPath, 'index.html'));
+});
+
 
 // holds all the rooms
 const rooms = new Map();
