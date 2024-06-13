@@ -9,7 +9,7 @@ Whether you're a grandmaster or beginner, 1v1 Chess provides an engaging way to 
 
 2. On tab 1, enter a name, and click "Create Room".
 
-3. Click "Copy Room ID"
+3. Click "Copy Room ID".
 
 4. On tab 2, enter another name, click "Join Room", and paste the room ID.
 
@@ -19,12 +19,12 @@ Whether you're a grandmaster or beginner, 1v1 Chess provides an engaging way to 
 ![chess_highlevel_design drawio (1)](https://github.com/minebreak28/1v1-Chess/assets/78050276/8140bf41-d5cd-42d6-9054-e0497c102dc3)
 
 ## Features
-- **Real-time Multiplayer**: Allows players to play chess against each other in real-time
-- **Chess Move Validation**: Validates moves including special moves like castling and promotions, using the chess.js library
-- **Game State Management**: Maintains the current state of the game, including player moves, turn management, and game status (check, checkmate, stalemate)
-- **Move History Log**: Keeps a detailed log of all moves made during the game, allowing players to analyze game history
-- **Messaging Functionality**: Provides a real-time chat where players can communicate with each other during the game
-- **PWA**: Installable as a progressive web app (PWA) on Chrome
+- **Real-time Multiplayer**: Allows players to play chess against each other in real-time.
+- **Chess Move Validation**: Validates moves including special moves like castling and promotions, using the chess.js library.
+- **Game State Management**: Maintains the current state of the game, including player moves, turn management, and game status (check, checkmate, stalemate).
+- **Move History Log**: Keeps a detailed log of all moves made during the game, allowing players to analyze game history.
+- **Messaging Functionality**: Provides a real-time chat where players can communicate with each other during the game.
+- **PWA**: Installable as a progressive web app (PWA) on Chrome.
 
 ## Technologies and Services Used
 
@@ -34,7 +34,7 @@ Whether you're a grandmaster or beginner, 1v1 Chess provides an engaging way to 
 
 **Node.js**: While technically not a language, Node.js is a runtime environment that allows the execution of JavaScript on the server side. It primarily manages WebSocket connections via Socket.io.
 
-**HTML/CSS**: HTML and CSS were used to structure and create visually appealing designs for the user interface
+**HTML/CSS**: HTML and CSS were used to structure and create visually appealing designs for the user interface.
 
 ### Libraries and Frameworks
 
