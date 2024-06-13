@@ -6,13 +6,14 @@ Whether you're a grandmaster or beginner, 1v1 Chess provides an engaging way to 
 
 ## How to deploy/test application
 i. Go to this website: [https://chess.adamwu.dev/](https://chess.adamwu.dev/) on two separate tabs.
+
 ii. On tab 1, enter a name, and click "Create Room".
+
 iii. Click "Copy Room ID"
+
 iv. On tab 2, enter another name, click "Join Room", and paste the room ID.
+
 v. Voila! You can now play chess with your friend, chat with them, and view the move history. When the game is over, players will be redirected back to the lobby.
 
-
-
-
-
+## High-level Architecture
 ![chess_highlevel_design drawio](https://github.com/minebreak28/1v1-Chess/assets/78050276/0ea0fbb8-d58d-4428-b8d6-b84571d4adf4)
