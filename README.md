@@ -5,7 +5,7 @@ The chess.js library handles the game logic, while the real-time communication i
 Whether you're a grandmaster or beginner, 1v1 Chess provides an engaging way to play chess online with friends.
 
 ## How to deploy/test application
-1. [https://chess.adamwu.dev](https://chess.adamwu.dev) on two separate tabs.
+1. Open [https://chess.adamwu.dev](https://chess.adamwu.dev) on two separate tabs.
 
 2. On tab 1, enter a name, and click "Create Room".
 
