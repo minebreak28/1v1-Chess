@@ -5,7 +5,7 @@ The chess.js library handles the game logic, while the real-time communication i
 Whether you're a grandmaster or beginner, 1v1 Chess provides an engaging way to play chess online with friends.
 
 ## How to deploy/test application
-1. Go to this website: [https://chess.adamwu.dev/](https://chess.adamwu.dev/) on two separate tabs.
+1. Go to this website: [https://chess.adamwu.dev](https://chess.adamwu.dev) on two separate tabs.
 
 2. On tab 1, enter a name, and click "Create Room".
 
@@ -17,3 +17,21 @@ Whether you're a grandmaster or beginner, 1v1 Chess provides an engaging way to 
 
 ## High-level Architecture
 ![chess_highlevel_design drawio](https://github.com/minebreak28/1v1-Chess/assets/78050276/0ea0fbb8-d58d-4428-b8d6-b84571d4adf4)
+
+## Features
+- **Real-time Multiplayer**: Allows players to play chess against each other in real-time
+- **Chess Move Validation**: Validates moves including special moves like castling and promotions, using the chess.js library
+- **Game State Management**: Maintains the current state of the game, including player moves, turn management, and game status (check, checkmate, stalemate)
+- **Move History Log**: Keeps a detailed log of all moves made during the game, allowing players to analyze game history
+- **Messaging Functionality**: Provides a real-time chat where players can communicate with each other during the game
+- **PWA**: Installable as a progressive web app (PWA) on Chrome
+
+## Technologies and Services Used
+
+### Languages
+
+**JavaScript**: Used extensively in the frontend and backend
+
+**Node.js**: While technically not a language, Node.js
+
+**HTML/CSS**:
