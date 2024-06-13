@@ -5,7 +5,7 @@ The chess.js library handles the game logic, while the real-time communication i
 Whether you're a grandmaster or beginner, 1v1 Chess provides an engaging way to play chess online with friends.
 
 ## How to deploy/test application
-1. Go to this website: [https://chess.adamwu.dev](https://chess.adamwu.dev) on two separate tabs.
+1. [https://chess.adamwu.dev](https://chess.adamwu.dev) on two separate tabs.
 
 2. On tab 1, enter a name, and click "Create Room".
 
@@ -55,27 +55,24 @@ Whether you're a grandmaster or beginner, 1v1 Chess provides an engaging way to 
 
 **React-Chessboard**: React-chessboard is a React component for rendering a chessboard. it is used to display the game board and pieces.
 
+### Services
 
+**AWS Elastic Beanstalk**: Elastic Beanstalk is a platform as a service (PaaS) which deploys and manages the backend Node.js server. It greatly simplifies the process of application deployment by handling infrastructure provisioning, load balancing, auto-scaling, and monitoring.
 
+**AWS S3**: S3 provides object storage for the React frontend.
 
+**AWS Cloudfront**: Cloudfront delivers contents to user with low latency and provides a secure HTTPS connection.
 
+**AWS Route 53**: Route 53 manages the DNS and directs traffic to my custom domain name.
 
+## Future Plans and Goals
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+While this application effectively showcases my technical skills, there are several improvements and features I plan to implement in the future:
+- **User Profiles**: Players are able to create an account and play under a profile. Profiles will feature game statistics, such as win/loss and elo rating.
+- **Authentication**: The next logical step in implementing user profiles is to implement an authentication system to attach persistent user IDs to client sockets. This way, a client’s WebSocket connection can be easily identified, ensuring secure and consistent user sessions throughout the application. This can be done with something like Amazon Cognito or Auth0.
+- **Global Rooms**: Currently, active rooms are stored in a simple JavaScript Map. This is not ideal because it lacks persistence and scalability, meaning room data is lost when the server restarts. If deploying for production, the system cannot efficiently handle a large number of concurrent rooms and users. To combat this, I will make use of a database such as Redis or DynamoDB to store room data and game state. This way, rooms can be created and persist globally, allowing players to join rooms without needing an invite code if they choose. Empty rooms will close by themselves.
+- **Spectators**: I was originally going to implement this, but couldn't due to complications in logistics. While each room can only have two players, there should be an option to join a room as a spectator to view an ongoing match.
+- **Disconnection Improvements**: Currently, when a player disconnects, the other player wins by default and automatically gets sent back to the lobby. With this enhancement, disconnected clients will automatically rejoin a game room after they have connected. This can be done by also using a database, where room and game data can be retrieved from the backend.
+- **Enhanced Gameplay Features and Mechanics**: There are a lot of gameplay features that I thought about and would have loved to add, but unfortunately did not have enough time. Such features include reversing a move, adding a game clock, integrating an open-source chess engine like Stockfish for single-player mode, providing hints mid-game and analyses post-game, and implementing timed chess such as bullet, blitz, and rapid. I hope I can implement some of these in the future as they seem very fun to code.
+- **Docker**: I used Docker to containerize the frontend and backend, but was unable to deploy to Elastic Beanstalk, so I unfortunately had to scrap this. If I had more time and knowledge, I can use Docker to ensure consistent environments for development and testing. Docker containers are lightweight and portable, which makes them ideal for running in the cloud.
+- **Mobile Optimization**: This application is not optimal on mobile devices. For production, this app will use Bootstrap or Tailwind CSS for mobile accessibility.
